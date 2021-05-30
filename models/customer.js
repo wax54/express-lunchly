@@ -29,6 +29,24 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
+
+  /** find all customers who's firstName or lastName matches some part of the inputted string  */
+  static async search(term) {
+    term = `%${term}%`;
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes
+       FROM customers
+       WHERE first_name ILIKE $1 OR last_name ILIKE $1
+       ORDER BY last_name, first_name`, 
+       [term]
+    );
+    return results.rows.map(c => new Customer(c));
+  }
+
   /** get a customer by ID. */
 
   static async get(id) {
@@ -53,6 +71,7 @@ class Customer {
     return new Customer(customer);
   }
 
+
   /** get all reservations for this customer. */
 
   async getReservations() {
@@ -60,12 +79,13 @@ class Customer {
   }
 
   /** get the full name of the customer */
+
   fullName(){
     return `${this.firstName} ${this.lastName}`; 
   }
 
   /** save this customer. */
-
+  
   async save() {
     if (this.id === undefined) {
       const result = await db.query(
