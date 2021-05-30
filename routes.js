@@ -7,7 +7,7 @@ const Reservation = require("./models/reservation");
 
 const router = new express.Router();
 
-/** Homepage: show list of customers. */
+/** Homepage: show list of customers. if querystring 'term' provided, customers are filtered by that term */
 
 router.get("/", async function(req, res, next) {
   try {
@@ -18,7 +18,22 @@ router.get("/", async function(req, res, next) {
     } else {
       customers = await Customer.all();
     }
+
     return res.render("customer_list.html", { customers });
+
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+/** gets top Ten Customers */
+
+router.get("/top-ten", async function (req, res, next) {
+  try {
+    const customers = await Customer.top(10);
+    return res.render("top_customer_list.html", { customers });
+
   } catch (err) {
     return next(err);
   }
